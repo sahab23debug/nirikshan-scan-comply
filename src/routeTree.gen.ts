@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as OfficerVerifyRouteImport } from './routes/officer-verify'
 import { Route as ScanRouteImport } from './routes/scan'
+import { Route as ReportIdRouteImport } from './routes/report.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const ScanRoute = ScanRouteImport.update({
   path: '/scan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportIdRoute = ReportIdRouteImport.update({
+  id: '/report/$id',
+  path: '/report/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/officer-verify': typeof OfficerVerifyRoute
   '/scan': typeof ScanRoute
+  '/report/$id': typeof ReportIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/officer-verify': typeof OfficerVerifyRoute
   '/scan': typeof ScanRoute
+  '/report/$id': typeof ReportIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,20 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/officer-verify': typeof OfficerVerifyRoute
   '/scan': typeof ScanRoute
+  '/report/$id': typeof ReportIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/officer-verify' | '/scan'
+  fullPaths: '/' | '/dashboard' | '/officer-verify' | '/scan' | '/report/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/officer-verify' | '/scan'
-  id: '__root__' | '/' | '/dashboard' | '/officer-verify' | '/scan'
+  to: '/' | '/dashboard' | '/officer-verify' | '/scan' | '/report/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/officer-verify'
+    | '/scan'
+    | '/report/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +82,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   OfficerVerifyRoute: typeof OfficerVerifyRoute
   ScanRoute: typeof ScanRoute
+  ReportIdRoute: typeof ReportIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/report/$id': {
+      id: '/report/$id'
+      path: '/report/$id'
+      fullPath: '/report/$id'
+      preLoaderRoute: typeof ReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   OfficerVerifyRoute: OfficerVerifyRoute,
   ScanRoute: ScanRoute,
+  ReportIdRoute: ReportIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
