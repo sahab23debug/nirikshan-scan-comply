@@ -11,7 +11,7 @@ import {
 } from "./rules";
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3.7-flash";
+const MODEL = "openai/gpt-5.6-sol";
 
 const InputSchema = z.object({
   images: z.array(z.string().min(16)).min(1).max(4),
@@ -118,6 +118,7 @@ Include one entry per requested field key, in the same order.`;
       },
       body: JSON.stringify({
         model: MODEL,
+        reasoning_effort: "none",
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: systemPrompt },
