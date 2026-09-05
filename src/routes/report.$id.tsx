@@ -116,7 +116,7 @@ function ReportPage() {
     const lng = report.scans.lng ?? 77.209;
     const nearest = officers
       .map((o) => ({ ...o, km: distanceKm(lat, lng, o.home_lat, o.home_lng) }))
-      .sort((a, b) => a.km - b.km)[0];
+      .sort((a, b) => a.km - b.km)[0]!;
 
     const { error } = await supabase.from("citizen_flags").insert({
       report_id: report.id,

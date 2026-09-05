@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { analyzeLabel } from "@/lib/analysis.functions";
 import { prepareImage, getPosition, type PreparedImage } from "@/lib/images";
 import { CATEGORIES, type Category } from "@/lib/rules";
+import type { Json } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/scan")({
@@ -158,8 +159,8 @@ function ScanPage() {
           scan_id: scan.id,
           user_id: uid,
           overall_status: result.status,
-          fields: result.fields,
-          nutrition: result.nutrition,
+          fields: result.fields as unknown as Json,
+          nutrition: (result.nutrition ?? null) as unknown as Json,
           summary: `${result.fields.filter((f) => f.verdict === "pass").length} of ${result.fields.length} applicable declarations compliant.`,
         })
         .select("id")

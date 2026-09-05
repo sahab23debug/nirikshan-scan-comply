@@ -161,7 +161,7 @@ function buildTimeline(reports: ReportLike[]) {
       month: "short",
     });
     const i = index.get(key);
-    if (i !== undefined) days[i].scans += 1;
+    if (i !== undefined && days[i]) days[i]!.scans += 1;
   }
   return days;
 }

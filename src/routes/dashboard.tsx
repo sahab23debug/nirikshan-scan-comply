@@ -225,7 +225,7 @@ function Dashboard() {
             flags.map((f) => (
               <Card key={f.id} className="shadow-soft animate-fade-up">
                 <CardContent className="flex items-center gap-3 p-3">
-                  <ScanThumb path={f.reports?.scans?.images?.[0]} />
+                  <ScanThumb path={f.reports?.scans?.images?.[0] ?? null} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
                       {f.reports?.scans?.product_name ?? "Unnamed product"}
@@ -275,7 +275,7 @@ function ReportRowCard({ report, index }: { report: ReportRow; index: number }) 
         style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
       >
         <CardContent className="flex items-center gap-3 p-3">
-          <ScanThumb path={report.scans?.images?.[0]} />
+          <ScanThumb path={report.scans?.images?.[0] ?? null} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">
               {report.scans?.product_name ?? "Unnamed product"}
