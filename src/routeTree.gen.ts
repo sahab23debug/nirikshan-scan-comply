@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as OfficerVerifyRouteImport } from './routes/officer-verify'
+import { Route as RepositoryRouteImport } from './routes/repository'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as ReportIdRouteImport } from './routes/report.$id'
 
@@ -30,6 +31,11 @@ const OfficerVerifyRoute = OfficerVerifyRouteImport.update({
   path: '/officer-verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RepositoryRoute = RepositoryRouteImport.update({
+  id: '/repository',
+  path: '/repository',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScanRoute = ScanRouteImport.update({
   id: '/scan',
   path: '/scan',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/officer-verify': typeof OfficerVerifyRoute
+  '/repository': typeof RepositoryRoute
   '/scan': typeof ScanRoute
   '/report/$id': typeof ReportIdRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/officer-verify': typeof OfficerVerifyRoute
+  '/repository': typeof RepositoryRoute
   '/scan': typeof ScanRoute
   '/report/$id': typeof ReportIdRoute
 }
@@ -60,19 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/officer-verify': typeof OfficerVerifyRoute
+  '/repository': typeof RepositoryRoute
   '/scan': typeof ScanRoute
   '/report/$id': typeof ReportIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/officer-verify' | '/scan' | '/report/$id'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/officer-verify'
+    | '/repository'
+    | '/scan'
+    | '/report/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/officer-verify' | '/scan' | '/report/$id'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/officer-verify'
+    | '/repository'
+    | '/scan'
+    | '/report/$id'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/officer-verify'
+    | '/repository'
     | '/scan'
     | '/report/$id'
   fileRoutesById: FileRoutesById
@@ -81,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   OfficerVerifyRoute: typeof OfficerVerifyRoute
+  RepositoryRoute: typeof RepositoryRoute
   ScanRoute: typeof ScanRoute
   ReportIdRoute: typeof ReportIdRoute
 }
@@ -108,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfficerVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/repository': {
+      id: '/repository'
+      path: '/repository'
+      fullPath: '/repository'
+      preLoaderRoute: typeof RepositoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scan': {
       id: '/scan'
       path: '/scan'
@@ -129,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   OfficerVerifyRoute: OfficerVerifyRoute,
+  RepositoryRoute: RepositoryRoute,
   ScanRoute: ScanRoute,
   ReportIdRoute: ReportIdRoute,
 }
