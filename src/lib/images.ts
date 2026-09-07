@@ -19,7 +19,7 @@ export async function prepareImage(file: File, maxSide = 2048): Promise<Prepared
   ctx.drawImage(bitmap, 0, 0, width, height);
   bitmap.close?.();
 
-  const dataUrl = canvas.toDataURL("image/jpeg", 0.78);
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
   const blob = await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
       (b) => (b ? resolve(b) : reject(new Error("Image conversion failed"))),
