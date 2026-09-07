@@ -22,6 +22,7 @@ export interface ReportRow {
   fields: FieldResult[];
   nutrition: NutritionSnapshot | null;
   summary: string | null;
+  batch_id: string | null;
   created_at: string;
   scans: ScanRow | null;
 }
@@ -44,6 +45,16 @@ export async function fetchReport(id: string): Promise<ReportRow | null> {
     .maybeSingle();
   if (error) throw error;
   return (data as unknown as ReportRow) ?? null;
+}
+
+export async function fetchBatchReports(batchId: string): Promise<ReportRow[]> {
+  const { data, error } = await supabase
+    .from("reports")
+    .select("*, scans(*)")
+    .eq("batch_id", batchId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as unknown as ReportRow[];
 }
 
 export interface FlagRow {
