@@ -18,6 +18,8 @@ const InputSchema = z.object({
   category: z.string(),
   imported: z.boolean(),
   multiPack: z.boolean(),
+  /** Officer-approved declarations on record for this product, keyed by declaration key. */
+  expected: z.record(z.string(), z.string()).optional(),
 });
 
 /**
@@ -49,6 +51,7 @@ const ModelField = z.object({
   contrastAdequate: z.boolean(),
   confidence: z.number(),
   notes: z.string().nullable().optional(),
+  matchesExpected: z.boolean().nullable().optional(),
 });
 
 const ModelResponse = z.object({
@@ -81,6 +84,12 @@ export const analyzeLabel = createServerFn({ method: "POST" })
     const applicable = applicableDeclarations(category, data.imported, data.multiPack);
     const isFood = category === "Food";
 
+    const expected = data.expected ?? {};
+    const expectedLines = applicable
+      .filter((d) => (expected[d.key] ?? "").trim().length > 0)
+      .map((d) => `- "${d.key}" should read: ${expected[d.key]}`)
+      .join("\n");
+
     const schemaLines = applicable
       .map((d) => `- "${d.key}" — ${d.label} (${d.rule}). ${d.hint}`)
       .join("\n");
@@ -111,7 +120,11 @@ Return JSON of this exact shape:
      ? `{"servingSize": string|null, "calories": number|null, "fat": number|null, "saturatedFat": number|null, "sugar": number|null, "protein": number|null, "sodium": number|null, "fibre": number|null, "found": boolean} (per serving; sodium in mg, others in g/kcal; found=false if no nutrition table is visible)`
      : `null`
  }}
-Include one entry per requested field key, in the same order.`;
+Include one entry per requested field key, in the same order.${
+      expectedLines
+        ? `\n\nThis product is registered in the official approved-product repository with these declared values:\n${expectedLines}\nFor each of those keys also return "matchesExpected": true when the printed label agrees with the registered value (ignore spacing, case and formatting differences), false when it genuinely contradicts it (e.g. a different MRP or net quantity), and null when you cannot tell. Mention the mismatch in notes.`
+        : ""
+    }`;
 
     const res = await fetch(GATEWAY, {
       method: "POST",
@@ -165,6 +178,8 @@ Include one entry per requested field key, in the same order.`;
         contrastAdequate: m?.contrastAdequate ?? false,
         confidence: clamp(m?.confidence ?? 0),
         notes: m?.notes ?? (m ? null : "No reading returned for this declaration."),
+        expectedValue: (expected[d.key] ?? "").trim() || null,
+        matchesExpected: m?.matchesExpected ?? null,
       };
       return { ...base, label: d.label, rule: d.rule, verdict: verdictForField(base) };
     });

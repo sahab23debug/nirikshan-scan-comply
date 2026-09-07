@@ -137,6 +137,10 @@ export interface FieldResult {
   confidence: number;
   notes: string | null;
   verdict: FieldVerdict;
+  /** Value registered by an officer in the approved product repository, if any. */
+  expectedValue?: string | null;
+  /** Whether the printed label agrees with the registered declaration. */
+  matchesExpected?: boolean | null;
 }
 
 export const CONFIDENCE_REVIEW_THRESHOLD = 0.6;
@@ -146,6 +150,8 @@ export function verdictForField(
 ): FieldVerdict {
   // A declaration that is missing altogether is the only automatic failure.
   if (!f.valuePresent) return f.confidence < CONFIDENCE_REVIEW_THRESHOLD ? "review" : "fail";
+  // Printed value contradicts the officer-approved declaration on record.
+  if (f.matchesExpected === false) return "fail";
   if (f.confidence < CONFIDENCE_REVIEW_THRESHOLD) return "review";
   // Present but the text was actually read: size/contrast concerns are a judgement
   // call for the officer, not an automatic non-compliance.
@@ -154,6 +160,7 @@ export function verdictForField(
   if (!f.legible || !f.fontSizeAdequate || !f.contrastAdequate) return "review";
   return "pass";
 }
+
 
 export function overallStatus(fields: FieldResult[]): OverallStatus {
   if (fields.some((f) => f.verdict === "fail")) return "non_compliant";

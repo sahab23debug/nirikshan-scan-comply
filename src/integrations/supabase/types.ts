@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      approved_products: {
+        Row: {
+          barcode: string | null
+          brand: string | null
+          category: string
+          created_at: string
+          declarations: Json
+          id: string
+          imported: boolean
+          multi_pack: boolean
+          name: string
+          nutrition: Json | null
+          officer_id: string | null
+          status: string
+          submitted_by: string
+          updated_at: string
+        }
+        Insert: {
+          barcode?: string | null
+          brand?: string | null
+          category: string
+          created_at?: string
+          declarations?: Json
+          id?: string
+          imported?: boolean
+          multi_pack?: boolean
+          name: string
+          nutrition?: Json | null
+          officer_id?: string | null
+          status?: string
+          submitted_by: string
+          updated_at?: string
+        }
+        Update: {
+          barcode?: string | null
+          brand?: string | null
+          category?: string
+          created_at?: string
+          declarations?: Json
+          id?: string
+          imported?: boolean
+          multi_pack?: boolean
+          name?: string
+          nutrition?: Json | null
+          officer_id?: string | null
+          status?: string
+          submitted_by?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audit_events: {
         Row: {
           action: string
@@ -193,6 +244,7 @@ export type Database = {
       }
       reports: {
         Row: {
+          batch_id: string | null
           created_at: string
           fields: Json
           id: string
@@ -203,6 +255,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          batch_id?: string | null
           created_at?: string
           fields?: Json
           id?: string
@@ -213,6 +266,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          batch_id?: string | null
           created_at?: string
           fields?: Json
           id?: string
@@ -224,6 +278,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "reports_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "scan_batches"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "reports_scan_id_fkey"
             columns: ["scan_id"]
             isOneToOne: false
@@ -231,6 +292,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scan_batches: {
+        Row: {
+          created_at: string
+          id: string
+          location_label: string | null
+          note: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_label?: string | null
+          note?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_label?: string | null
+          note?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       scans: {
         Row: {
