@@ -87,13 +87,16 @@ export const analyzeLabel = createServerFn({ method: "POST" })
 
     const systemPrompt = `You are a Legal Metrology (Packaged Commodities) Rules, 2011 label inspector for India's Department of Consumer Affairs.
 You inspect photographs of a packaged commodity label and report, per declaration, whether it is present AND whether it is legible and prominent.
+Read the label like a careful OCR system first, then judge. Zoom mentally into every panel: front, back, side gussets, bottom seal, batch/date inkjet strip and the small print block. Declarations are often printed vertically, on the back seal, or in a dense multi-line block — search there before concluding anything is missing.
 Rules for your judgement:
-- valuePresent: true only if the declaration is actually printed on the label images.
+- valuePresent: true if the declaration is printed anywhere on the label images, in any orientation or size.
 - extractedValue: the verbatim text as printed (include units and currency), else null.
-- legible: false if blurred, cut off, overprinted or unreadable at normal viewing.
-- fontSizeAdequate: false if the text height is clearly smaller than other mandatory declarations or too small to read at arm's length.
-- contrastAdequate: false if low contrast against the background or buried in visual clutter.
-- confidence: 0..1 for how certain you are of this reading. Use below 0.6 when the image quality prevents a reliable determination.
+- legible: true whenever you were able to actually read the text from the photo. Set false ONLY if the characters are genuinely unreadable — blurred beyond recognition, cut off by the frame, or obscured.
+- fontSizeAdequate: default TRUE. Set false only when the print is so small that a shopper with normal eyesight could not read it at arm's length — i.e. clearly below roughly 1 mm character height, or dramatically smaller than every other declaration on the pack. Small-but-readable print, inkjet batch/date coding and standard fine print are ADEQUATE. Never mark false merely because you had to look closely, or because you read it successfully at all.
+- contrastAdequate: default TRUE. Set false only for text that nearly disappears into the background (e.g. light grey on white, printed over a busy photo). Normal black-on-white, white-on-dark and embossed-but-readable print are adequate.
+- If you successfully transcribed the text, fontSizeAdequate and contrastAdequate should almost always be true — reserve false for genuine, defensible legal-metrology prominence violations you would stand behind in an inspection report.
+- confidence: 0..1 for how certain you are of this reading. Use below 0.6 only when the image quality genuinely prevents a determination.
+- notes: mention the panel where you found it, or the specific defect. Do not repeat boilerplate.
 Never guess values you cannot see. Return strict JSON only, no prose, no markdown.`;
 
     const userPrompt = `Product category: ${category}. Imported: ${data.imported}. Multi-piece pack: ${data.multiPack}.
