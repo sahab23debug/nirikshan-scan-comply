@@ -144,9 +144,14 @@ export const CONFIDENCE_REVIEW_THRESHOLD = 0.6;
 export function verdictForField(
   f: Omit<FieldResult, "verdict" | "label" | "rule">,
 ): FieldVerdict {
+  // A declaration that is missing altogether is the only automatic failure.
+  if (!f.valuePresent) return f.confidence < CONFIDENCE_REVIEW_THRESHOLD ? "review" : "fail";
   if (f.confidence < CONFIDENCE_REVIEW_THRESHOLD) return "review";
-  if (!f.valuePresent) return "fail";
-  if (!f.legible || !f.fontSizeAdequate || !f.contrastAdequate) return "fail";
+  // Present but the text was actually read: size/contrast concerns are a judgement
+  // call for the officer, not an automatic non-compliance.
+  const readValue = (f.extractedValue ?? "").trim().length > 0;
+  if (!f.legible && !readValue) return "fail";
+  if (!f.legible || !f.fontSizeAdequate || !f.contrastAdequate) return "review";
   return "pass";
 }
 

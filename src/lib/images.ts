@@ -5,7 +5,7 @@ export interface PreparedImage {
 }
 
 /** Downscale + compress a captured photo so it is fast to upload and to analyse. */
-export async function prepareImage(file: File, maxSide = 1280): Promise<PreparedImage> {
+export async function prepareImage(file: File, maxSide = 2048): Promise<PreparedImage> {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
   const width = Math.round(bitmap.width * scale);
@@ -19,7 +19,7 @@ export async function prepareImage(file: File, maxSide = 1280): Promise<Prepared
   ctx.drawImage(bitmap, 0, 0, width, height);
   bitmap.close?.();
 
-  const dataUrl = canvas.toDataURL("image/jpeg", 0.78);
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
   const blob = await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
       (b) => (b ? resolve(b) : reject(new Error("Image conversion failed"))),
