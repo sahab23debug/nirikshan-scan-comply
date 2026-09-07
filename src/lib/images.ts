@@ -5,7 +5,7 @@ export interface PreparedImage {
 }
 
 /** Downscale + compress a captured photo so it is fast to upload and to analyse. */
-export async function prepareImage(file: File, maxSide = 1280): Promise<PreparedImage> {
+export async function prepareImage(file: File, maxSide = 2048): Promise<PreparedImage> {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
   const width = Math.round(bitmap.width * scale);
