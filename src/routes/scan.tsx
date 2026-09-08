@@ -33,9 +33,8 @@ import { CATEGORIES, type Category, type DeclarationKey } from "@/lib/rules";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/scan")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    batch: typeof search['batch'] === "string" ? (search['batch'] as string) : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { batch?: string } =>
+    typeof search['batch'] === "string" ? { batch: search['batch'] as string } : {},
   head: () => ({
     meta: [
       { title: "Scan a product — Nirikshan AI" },
