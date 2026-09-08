@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { cacheGet, cacheSet } from "@/lib/offline";
 import type { FieldResult, NutritionSnapshot, OverallStatus } from "@/lib/rules";
 
 export interface ScanRow {
@@ -28,13 +29,22 @@ export interface ReportRow {
 }
 
 export async function fetchReports(): Promise<ReportRow[]> {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("*, scans(*)")
-    .order("created_at", { ascending: false })
-    .limit(200);
-  if (error) throw error;
-  return (data ?? []) as unknown as ReportRow[];
+  try {
+    const { data, error } = await supabase
+      .from("reports")
+      .select("*, scans(*)")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    const rows = (data ?? []) as unknown as ReportRow[];
+    cacheSet("reports", rows);
+    return rows;
+  } catch (e) {
+    // Offline or unreachable: fall back to the last list this device saw.
+    const cached = cacheGet<ReportRow[]>("reports");
+    if (cached) return cached;
+    throw e;
+  }
 }
 
 export async function fetchReport(id: string): Promise<ReportRow | null> {
