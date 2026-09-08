@@ -181,7 +181,7 @@ function Dashboard() {
       </Button>
 
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <Link to="/scan" search={{ batch: undefined }}>
+        <Link to="/scan" search={{}}>
           <Button variant="secondary" className="w-full">
             <Layers className="size-4" /> Batch inspection
           </Button>
@@ -219,7 +219,7 @@ function Dashboard() {
               title="No batch inspections yet"
               description="Turn on batch inspection while scanning to group several products into one combined report."
               action={
-                <Link to="/scan" search={{ batch: undefined }}>
+                <Link to="/scan" search={{}}>
                   <Button>
                     <Layers className="size-4" /> Start a batch
                   </Button>
