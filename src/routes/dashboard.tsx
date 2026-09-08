@@ -164,6 +164,15 @@ function Dashboard() {
         />
       </div>
 
+      {(!online || pendingOffline > 0) && (
+        <p className="mt-4 flex items-center gap-2 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs text-warning">
+          <CloudOff className="size-4 shrink-0" />
+          {online
+            ? `Syncing ${pendingOffline} scan${pendingOffline === 1 ? "" : "s"} captured offline…`
+            : "You're offline. Saved reports stay readable and new scans are queued on this device."}
+        </p>
+      )}
+
       <Button
         className="mt-4 h-14 w-full text-base animate-pulse-ring"
         onClick={() => navigate({ to: "/scan" })}
@@ -171,10 +180,26 @@ function Dashboard() {
         <ScanLine className="size-5" /> Scan a Product
       </Button>
 
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <Link to="/scan" search={{ batch: undefined }}>
+          <Button variant="secondary" className="w-full">
+            <Layers className="size-4" /> Batch inspection
+          </Button>
+        </Link>
+        <Link to="/repository">
+          <Button variant="secondary" className="w-full">
+            <BookMarked className="size-4" /> Product register
+          </Button>
+        </Link>
+      </div>
+
       <Tabs defaultValue="activity" className="mt-6">
         <TabsList className="w-full">
           <TabsTrigger value="activity" className="flex-1">
             Activity
+          </TabsTrigger>
+          <TabsTrigger value="batches" className="flex-1">
+            Batches
           </TabsTrigger>
           <TabsTrigger value="reports" className="flex-1">
             Reports
@@ -186,6 +211,47 @@ function Dashboard() {
             Insights
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="batches" className="mt-4 space-y-2">
+          {(batchesQuery.data ?? []).length === 0 ? (
+            <EmptyState
+              image={emptyScans}
+              title="No batch inspections yet"
+              description="Turn on batch inspection while scanning to group several products into one combined report."
+              action={
+                <Link to="/scan" search={{ batch: undefined }}>
+                  <Button>
+                    <Layers className="size-4" /> Start a batch
+                  </Button>
+                </Link>
+              }
+            />
+          ) : (
+            (batchesQuery.data ?? []).map((b) => {
+              const inBatch = all.filter((r) => r.batch_id === b.id);
+              return (
+                <Link key={b.id} to="/batch/$id" params={{ id: b.id }} className="block">
+                  <Card className="shadow-soft transition-shadow hover:shadow-lift animate-fade-up">
+                    <CardContent className="flex items-center gap-3 p-3">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                        <Layers className="size-5" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{b.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {inBatch.length} product{inBatch.length === 1 ? "" : "s"} ·{" "}
+                          {new Date(b.created_at).toLocaleString("en-IN")}
+                        </p>
+                      </div>
+                      <ChevronRight className="size-4 text-muted-foreground" />
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })
+          )}
+        </TabsContent>
+
 
         <TabsContent value="activity" className="mt-4 space-y-2">
           {reportsQuery.isLoading ? (
