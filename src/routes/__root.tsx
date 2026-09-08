@@ -128,6 +128,14 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Offline shell: keeps the app usable (and instant) without a connection.
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
+    const register = () => void navigator.serviceWorker.register("/sw.js").catch(() => {});
+    if (document.readyState === "complete") register();
+    else window.addEventListener("load", register, { once: true });
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

@@ -10,6 +10,9 @@ import {
   MapPin,
   ChevronRight,
   CheckCheck,
+  CloudOff,
+  Layers,
+  BookMarked,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
@@ -23,7 +26,10 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { fetchFlags, fetchReports, type ReportRow } from "@/lib/queries";
+import { fetchBatches } from "@/lib/repository";
+import { useOnline, usePendingCount } from "@/lib/offline";
 import { supabase } from "@/integrations/supabase/client";
 import { getRoleIntent } from "@/lib/roleIntent";
 import emptyScans from "@/assets/empty-scans.png";
@@ -66,15 +72,28 @@ function Dashboard() {
 
   const isOfficer = profile?.role === "officer";
 
+  const online = useOnline();
+  const pendingOffline = usePendingCount();
+  useOfflineSync(session?.user.id);
+
   const reportsQuery = useQuery({
     queryKey: ["reports", session?.user.id],
     queryFn: fetchReports,
     enabled: Boolean(session),
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
   });
   const flagsQuery = useQuery({
     queryKey: ["flags", session?.user.id],
     queryFn: fetchFlags,
     enabled: Boolean(session),
+    staleTime: 30_000,
+  });
+  const batchesQuery = useQuery({
+    queryKey: ["batches", session?.user.id],
+    queryFn: fetchBatches,
+    enabled: Boolean(session),
+    staleTime: 30_000,
   });
 
   const all = reportsQuery.data ?? [];
@@ -145,6 +164,15 @@ function Dashboard() {
         />
       </div>
 
+      {(!online || pendingOffline > 0) && (
+        <p className="mt-4 flex items-center gap-2 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs text-warning">
+          <CloudOff className="size-4 shrink-0" />
+          {online
+            ? `Syncing ${pendingOffline} scan${pendingOffline === 1 ? "" : "s"} captured offline…`
+            : "You're offline. Saved reports stay readable and new scans are queued on this device."}
+        </p>
+      )}
+
       <Button
         className="mt-4 h-14 w-full text-base animate-pulse-ring"
         onClick={() => navigate({ to: "/scan" })}
@@ -152,10 +180,26 @@ function Dashboard() {
         <ScanLine className="size-5" /> Scan a Product
       </Button>
 
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <Link to="/scan" search={{}}>
+          <Button variant="secondary" className="w-full">
+            <Layers className="size-4" /> Batch inspection
+          </Button>
+        </Link>
+        <Link to="/repository">
+          <Button variant="secondary" className="w-full">
+            <BookMarked className="size-4" /> Product register
+          </Button>
+        </Link>
+      </div>
+
       <Tabs defaultValue="activity" className="mt-6">
         <TabsList className="w-full">
           <TabsTrigger value="activity" className="flex-1">
             Activity
+          </TabsTrigger>
+          <TabsTrigger value="batches" className="flex-1">
+            Batches
           </TabsTrigger>
           <TabsTrigger value="reports" className="flex-1">
             Reports
@@ -167,6 +211,47 @@ function Dashboard() {
             Insights
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="batches" className="mt-4 space-y-2">
+          {(batchesQuery.data ?? []).length === 0 ? (
+            <EmptyState
+              image={emptyScans}
+              title="No batch inspections yet"
+              description="Turn on batch inspection while scanning to group several products into one combined report."
+              action={
+                <Link to="/scan" search={{}}>
+                  <Button>
+                    <Layers className="size-4" /> Start a batch
+                  </Button>
+                </Link>
+              }
+            />
+          ) : (
+            (batchesQuery.data ?? []).map((b) => {
+              const inBatch = all.filter((r) => r.batch_id === b.id);
+              return (
+                <Link key={b.id} to="/batch/$id" params={{ id: b.id }} className="block">
+                  <Card className="shadow-soft transition-shadow hover:shadow-lift animate-fade-up">
+                    <CardContent className="flex items-center gap-3 p-3">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                        <Layers className="size-5" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{b.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {inBatch.length} product{inBatch.length === 1 ? "" : "s"} ·{" "}
+                          {new Date(b.created_at).toLocaleString("en-IN")}
+                        </p>
+                      </div>
+                      <ChevronRight className="size-4 text-muted-foreground" />
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })
+          )}
+        </TabsContent>
+
 
         <TabsContent value="activity" className="mt-4 space-y-2">
           {reportsQuery.isLoading ? (

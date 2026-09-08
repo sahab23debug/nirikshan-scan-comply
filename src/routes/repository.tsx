@@ -22,6 +22,7 @@ import {
 } from "@/lib/rules";
 import type { Json } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
+import emptyScans from "@/assets/empty-scans.png";
 
 export const Route = createFileRoute("/repository")({
   head: () => ({
@@ -300,8 +301,9 @@ function RepositoryPage() {
         {isLoading && <p className="text-sm text-muted-foreground">Loading the register…</p>}
         {!isLoading && !products?.length && (
           <EmptyState
+            image={emptyScans}
             title="No approved products yet"
-            body="Officers can register a product once and every future scan of that pack is cross-checked against these declarations."
+            description="Officers can register a product once and every future scan of that pack is cross-checked against these declarations."
           />
         )}
         {products?.map((p) => (

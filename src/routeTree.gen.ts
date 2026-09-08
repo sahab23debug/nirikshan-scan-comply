@@ -14,6 +14,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as OfficerVerifyRouteImport } from './routes/officer-verify'
 import { Route as RepositoryRouteImport } from './routes/repository'
 import { Route as ScanRouteImport } from './routes/scan'
+import { Route as BatchIdRouteImport } from './routes/batch.$id'
 import { Route as ReportIdRouteImport } from './routes/report.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const ScanRoute = ScanRouteImport.update({
   path: '/scan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BatchIdRoute = BatchIdRouteImport.update({
+  id: '/batch/$id',
+  path: '/batch/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportIdRoute = ReportIdRouteImport.update({
   id: '/report/$id',
   path: '/report/$id',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/officer-verify': typeof OfficerVerifyRoute
   '/repository': typeof RepositoryRoute
   '/scan': typeof ScanRoute
+  '/batch/$id': typeof BatchIdRoute
   '/report/$id': typeof ReportIdRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/officer-verify': typeof OfficerVerifyRoute
   '/repository': typeof RepositoryRoute
   '/scan': typeof ScanRoute
+  '/batch/$id': typeof BatchIdRoute
   '/report/$id': typeof ReportIdRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/officer-verify': typeof OfficerVerifyRoute
   '/repository': typeof RepositoryRoute
   '/scan': typeof ScanRoute
+  '/batch/$id': typeof BatchIdRoute
   '/report/$id': typeof ReportIdRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/officer-verify'
     | '/repository'
     | '/scan'
+    | '/batch/$id'
     | '/report/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/officer-verify'
     | '/repository'
     | '/scan'
+    | '/batch/$id'
     | '/report/$id'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/officer-verify'
     | '/repository'
     | '/scan'
+    | '/batch/$id'
     | '/report/$id'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +117,7 @@ export interface RootRouteChildren {
   OfficerVerifyRoute: typeof OfficerVerifyRoute
   RepositoryRoute: typeof RepositoryRoute
   ScanRoute: typeof ScanRoute
+  BatchIdRoute: typeof BatchIdRoute
   ReportIdRoute: typeof ReportIdRoute
 }
 
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/batch/$id': {
+      id: '/batch/$id'
+      path: '/batch/$id'
+      fullPath: '/batch/$id'
+      preLoaderRoute: typeof BatchIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/report/$id': {
       id: '/report/$id'
       path: '/report/$id'
@@ -161,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfficerVerifyRoute: OfficerVerifyRoute,
   RepositoryRoute: RepositoryRoute,
   ScanRoute: ScanRoute,
+  BatchIdRoute: BatchIdRoute,
   ReportIdRoute: ReportIdRoute,
 }
 export const routeTree = rootRouteImport
