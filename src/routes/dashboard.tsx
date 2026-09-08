@@ -72,15 +72,28 @@ function Dashboard() {
 
   const isOfficer = profile?.role === "officer";
 
+  const online = useOnline();
+  const pendingOffline = usePendingCount();
+  useOfflineSync(session?.user.id);
+
   const reportsQuery = useQuery({
     queryKey: ["reports", session?.user.id],
     queryFn: fetchReports,
     enabled: Boolean(session),
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
   });
   const flagsQuery = useQuery({
     queryKey: ["flags", session?.user.id],
     queryFn: fetchFlags,
     enabled: Boolean(session),
+    staleTime: 30_000,
+  });
+  const batchesQuery = useQuery({
+    queryKey: ["batches", session?.user.id],
+    queryFn: fetchBatches,
+    enabled: Boolean(session),
+    staleTime: 30_000,
   });
 
   const all = reportsQuery.data ?? [];
