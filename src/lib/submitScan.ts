@@ -107,7 +107,8 @@ export async function submitScan(
           name: input.productName?.trim() || result.productName!,
           category: input.category,
         },
-        { onConflict: "barcode" },
+        // Rows are insert-only for officers/citizens; skip existing barcodes.
+        { onConflict: "barcode", ignoreDuplicates: true },
       );
     }
     await supabase.from("audit_events").insert({
