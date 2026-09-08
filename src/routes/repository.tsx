@@ -22,6 +22,7 @@ import {
 } from "@/lib/rules";
 import type { Json } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
+import emptyScans from "@/assets/empty-scans.png";
 
 export const Route = createFileRoute("/repository")({
   head: () => ({
