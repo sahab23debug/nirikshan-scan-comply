@@ -10,6 +10,9 @@ import {
   MapPin,
   ChevronRight,
   CheckCheck,
+  CloudOff,
+  Layers,
+  BookMarked,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
