@@ -80,12 +80,20 @@ export interface FlagRow {
 }
 
 export async function fetchFlags(): Promise<FlagRow[]> {
-  const { data, error } = await supabase
-    .from("citizen_flags")
-    .select("*, reports(*, scans(*))")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data ?? []) as unknown as FlagRow[];
+  try {
+    const { data, error } = await supabase
+      .from("citizen_flags")
+      .select("*, reports(*, scans(*))")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    const rows = (data ?? []) as unknown as FlagRow[];
+    cacheSet("flags", rows);
+    return rows;
+  } catch (e) {
+    const cached = cacheGet<FlagRow[]>("flags");
+    if (cached) return cached;
+    throw e;
+  }
 }
 
 /** Signed URL for a private scan photo (officers and the owner can read). */
